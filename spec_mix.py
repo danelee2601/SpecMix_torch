@@ -5,9 +5,9 @@ from torch import Tensor
 
 
 class SpecMix(object):
-    def __init__(self, gamma: float = 0.3, n_mask_bars: int = 3):
+    def __init__(self, gamma: float = 0.3, n_max_mask_bars: int = 3):
         self.gamma = gamma
-        self.n_mask_bars = n_mask_bars
+        self.n_max_mask_bars = n_max_mask_bars
 
     def _select_mask_start_points(self, Sxx: Tensor, f_: int, mask_len: int, kind: str) -> List[int]:
         if kind == 'freq':
@@ -51,8 +51,8 @@ class SpecMix(object):
         """
 
         # select `f_freq` and `f_time` for the entire mini-batch, B_1.
-        f_freq = np.random.randint(0, self.n_mask_bars + 1)
-        f_time = np.random.randint(0, self.n_mask_bars + 1)
+        f_freq = np.random.randint(0, self.n_max_mask_bars + 1)
+        f_time = np.random.randint(0, self.n_max_mask_bars + 1)
 
         # get a randomly-permuted (rp) mini-batch, `B_2`
         rand_index = torch.randperm(Sxx.size()[0])
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     labels = torch.randint(0, 1, (batch_size, ))
 
     # apply SpecMix
-    spec_mix = SpecMix()
+    spec_mix = SpecMix(gamma=0.1, n_max_mask_bars=3)  # default gamma value is 0.3 in the paper.
     mixed_Sxx, lambda_, labels, labels_rp = spec_mix(Sxx, labels)
 
     # loss would look like:
