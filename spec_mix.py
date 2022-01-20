@@ -5,9 +5,9 @@ from torch import Tensor
 
 
 class SpecMix(object):
-    def __init__(self, ):
-        self.gamma = 0.3
-        self.n_mask_bars = 3
+    def __init__(self, gamma: float = 0.3, n_mask_bars: int = 3):
+        self.gamma = gamma
+        self.n_mask_bars = n_mask_bars
 
     def _select_mask_start_points(self, Sxx: Tensor, f_: int, mask_len: int, kind: str) -> List[int]:
         if kind == 'freq':
@@ -134,12 +134,15 @@ if __name__ == '__main__':
     spec_mix = SpecMix()
     mixed_Sxx, lambda_, labels, labels_rp = spec_mix(Sxx, labels)
 
+    # loss would look like:
+    # loss = lambda_ * criterion(pred_labels, labels) + (1 - lambda_) * criterion(pred_labels, labels)
+
     # take sample
     mixed_sxx = mixed_Sxx[0][0]
 
     # plot
     fig, ax1 = plt.subplots(figsize=(4, 3))
-    im1 = ax1.imshow(mixed_sxx, aspect='auto', )#vmin=0, vmax=0.4)
+    im1 = ax1.imshow(mixed_sxx, aspect='auto')
     ax1.invert_yaxis()
     fig.colorbar(im1)
     plt.show()
